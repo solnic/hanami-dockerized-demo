@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  base: &base
+    image: ${DOCKER_IMAGE:-solnic/hanami-blog}:${DOCKER_TAG:-latest}
+    env_file: [.env]
+    depends_on: [assets]
+    links: [assets]
+    volumes:
+      - .:/app
+      - bundle:/usr/local/bundle
+
+  development:
+    <<: *base
+    build:
+      context: .
+      target: development
+    entrypoint: script/development
+
+  test:
+    <<: *base
+    build:
+      context: .
+      target: test
+    entrypoint: script/test
+    env_file: [.env, .env.test]
+
+  assets:
+    image: node:alpine
+    env_file: ".env"
+    working_dir: /app
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    expose: [8080]
+    command: "npm start"
+
+volumes:
+  bundle:
+  node_modules:

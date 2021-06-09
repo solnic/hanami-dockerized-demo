@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+
+source script/setup
+
+if [ $# -eq 0 ]; then
+  [[ -f log/development.log ]] || touch log/development.log
+  tail -f log/development.log
+else
+  echo "Running $@"
+  exec $@
+fi
